@@ -124,5 +124,5 @@ async def poll(ctx, *,  message: str = ''):
     await ctx.send(content= "@everyone", view = view, embed = embed)
     
    
-
-bot.run('MTA3MzMxNDM5NDYxMzc2NDIxNg.Gc4-sk.nz1TtM0WVtvIFEk2wc9msfcAgpASve6cW1-C-g')
+token = ''
+bot.run(token)
