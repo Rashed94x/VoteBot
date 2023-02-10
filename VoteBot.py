@@ -1,6 +1,9 @@
 import discord
 from discord.ext import commands
 
+with open("token", "r") as file:
+    token = file.read().strip()
+
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -124,5 +127,4 @@ async def poll(ctx, *,  message: str = ''):
     await ctx.send(content= "@everyone", view = view, embed = embed)
     
    
-token = ''
 bot.run(token)
