@@ -38,7 +38,7 @@ optionally you can write a text to be shared with the image `!poll <TEXT>`.
 
 > **Note:** If you put multiple images in one poll command, the text will be displayed on all images.
 
-<img src="https://media.giphy.com/media/QD8vTv3WVi9SiUmtZY/giphy.gif" alt="Create single image poll" style="margin-right: 50px"/>
-<img src="https://media.giphy.com/media/qrmg54BAJePYwrDzpl/giphy.gif" alt="Create multiple images polls" style="margin-left: 50px"/>
+<img src="https://media.giphy.com/media/QD8vTv3WVi9SiUmtZY/giphy.gif" alt="Create single image poll" style="margin-right: 10px"/>
+<img src="https://media.giphy.com/media/qrmg54BAJePYwrDzpl/giphy.gif" alt="Create multiple images polls" style="margin-left: 10px"/>
 
 
