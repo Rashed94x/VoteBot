@@ -2,10 +2,66 @@
 import discord
 from discord.ext import commands
 from typing import Any
+import random
+import sys
 
-# Read the token from the file 'token'
-with open("token", "r") as file:
-    token = file.read().strip()
+# Try to open the token file for reading
+try:
+    with open("token", "r") as file:
+        # If the file can be opened, read its contents and store it in the variable "token"
+        token = file.read().strip()
+
+# If a FileNotFoundError is raised (i.e., the file could not be found), catch the exception
+except FileNotFoundError:
+    # Print an error message indicating that the file could not be found
+    print("The token file could not be found. Shutting down the bot...")
+    # Exit the program with a return code of 1, indicating that an error occurred
+    sys.exit(1)
+
+# Titles to the polls
+titles = [
+    "Love it or leave it!",
+    "Thumbs up or down?",
+    "The ultimate choice: Love it, Like, or Dislike?",
+    "How do you feel about this?",
+    "Your chance to express your emotions!",
+    "Share your love, like, or dislike!",
+    "Emojis speak louder than words!",
+    "Three options, one decision!",
+    "Heart it, like it, or dislike it!",
+    "Do you heart it, like it, or dislike it?",
+    "Time to show your love, like, or dislike!",
+    "Emote your reaction!",
+    "Love, like, or dislike: which one wins?",
+    "The power of emotions is in your hands!",
+    "A simple choice: love, like, or dislike!"
+]
+
+# Footers to the polls
+footers = [
+    "Make your voice heard!",
+    "Every vote counts!",
+    "Have your say in this poll!",
+    "Share your opinion with us!",
+    "Join the discussion!",
+    "Let's see what the community thinks!",
+    "Your participation matters!",
+    "Your choice counts!",
+    "Make a difference with your vote!",
+    "Get involved and cast your vote!",
+    "We want to hear from you!",
+    "Your vote could decide the outcome!",
+    "Your input is valuable to us!",
+    "Don't miss this chance to have your say!",
+    "Let your voice be heard!",
+]
+
+# Fields names
+fields = {
+    "like": "Liked",
+    "dislike": "Disliked",
+    "love": "Loved it"
+}
 
 # Set the intents for the bot
 intents = discord.Intents.default()
@@ -35,9 +91,9 @@ async def on_ready():
 
 # Function to update the embed with the latest interaction data
 def update_embed(embed: Any, msg_id: int):
-    embed.set_field_at(index=0, name="Like", value="\n".join(interacted_users[msg_id].liked))
-    embed.set_field_at(index=1, name="Dislike", value="\n".join(interacted_users[msg_id].disliked))
-    embed.set_field_at(index=2, name="Love it", value="\n".join(interacted_users[msg_id].loved))
+    embed.set_field_at(index=0, name=fields["like"], value="\n".join(interacted_users[msg_id].liked))
+    embed.set_field_at(index=1, name=fields["dislike"], value="\n".join(interacted_users[msg_id].disliked))
+    embed.set_field_at(index=2, name=fields["love"], value="\n".join(interacted_users[msg_id].loved))
     return embed
 
 
@@ -48,7 +104,7 @@ class Menu(discord.ui.View):
         self.value = None
 
     # Handler for the 'Like' option
-    @discord.ui.button(label="Like", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="Like", style=discord.ButtonStyle.green, emoji="👍🏼")
     async def opt1(self, interaction: discord.Interaction, button: discord.ui.Button):
         msg_id = interaction.message.id
         usr_name = interaction.user.name
@@ -75,7 +131,7 @@ class Menu(discord.ui.View):
         await interaction.response.edit_message(embed=update_embed(interaction.message.embeds[0], msg_id))
 
     # Handler for the 'Dislike' option
-    @discord.ui.button(label="Dislike", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="Dislike", style=discord.ButtonStyle.red, emoji="👎🏼")
     async def opt2(self, interaction: discord.Interaction, button: discord.ui.Button):
         msg_id = interaction.message.id
         usr_name = interaction.user.name
@@ -102,7 +158,7 @@ class Menu(discord.ui.View):
         await interaction.response.edit_message(embed=update_embed(interaction.message.embeds[0], msg_id))
 
     # Handler for the 'Love it!' option
-    @discord.ui.button(label="Love it!", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="Love it!", style=discord.ButtonStyle.blurple, emoji="❤️")
     async def opt3(self, interaction: discord.Interaction, button: discord.ui.Button):
         msg_id = interaction.message.id
         usr_name = interaction.user.name
@@ -131,26 +187,37 @@ class Menu(discord.ui.View):
 
 @bot.command()
 async def poll(ctx, *, message: str = ''):
-    # Check if the message is empty and return an error message if so
-    if message == '':
-        await ctx.send("Your message can't be empty!")
+    # check if message and attachments are not empty
+    if len(message) == 0 and len(ctx.message.attachments) == 0:
+        await ctx.send("Your message can't be empty!", )
         return
 
-    # Create a Menu object
+    # create a view with Menu object
     view = Menu()
 
     # Delete the original message
     await ctx.message.delete()
 
-    # Create an embed with the poll message, colors, fields and footer
-    embed = discord.Embed(title=f"{ctx.author.name} asks for your vote!", description=message,
-                          color=discord.Color.random())
-    embed.add_field(name="Like:", value='', inline=True)
-    embed.add_field(name="Dislike:", value='', inline=True)
-    embed.add_field(name="Love It:", value='', inline=True)
-    embed.set_footer(text="Your voice makes change!")
-    # Send the embed to everyone in the channel with the "@everyone" mention
-    await ctx.send(content="@everyone", view=view, embed=embed)
+    # create embed object with its fields
+    embed = discord.Embed(description=message, color=discord.Color.random())
+    embed.add_field(name=fields["like"], value='', inline=True)
+    embed.add_field(name=fields["dislike"], value='', inline=True)
+    embed.add_field(name=fields["love"], value='', inline=True)
+
+    # check if there's any attachments
+    if len(ctx.message.attachments) > 0:
+        # create a poll for each attachment
+        for img in ctx.message.attachments:
+            embed.title = random.choice(titles)
+            embed.set_footer(text=random.choice(footers))
+            embed.set_image(url=img)
+            await ctx.send(content="@everyone", view=view, embed=embed)
+    else:
+        # create a poll without attachments
+        embed.title = random.choice(titles)
+        embed.set_footer(text=random.choice(footers))
+        await ctx.send(content="@everyone", view=view, embed=embed)
+
 
 # Run the bot
 bot.run(token)
