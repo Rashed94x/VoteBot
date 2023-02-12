@@ -1,5 +1,9 @@
 # VoteBot
 
+<div style="width:100px; height:100px; border-radius:50%; overflow:hidden; display:inline-block;">
+  <img src="./assets/logo.png" alt="Your Image" style="width:100%; height:auto;">
+</div>
+
 VoteBot is a Discord bot that allows users to react to messages with "Like," "Dislike," or "Love it" and keeps track of
 the users who have reacted to the messages.
 
@@ -11,34 +15,36 @@ the users who have reacted to the messages.
 
 ## Technical Details:
 
-The bot is built using the `discord.py` library and utilizes the `discord.ext.commands` and `discord.Intents` classes to
-handle interactions within the Discord channel. The bot stores information about the messages and user interactions in a
-global dictionary that is stored in memory. The bot updates this information every time a user interacts with a message.
+The bot is built using the `discord.py` library and utilizes the `discord.ext.commands` classe to handle interactions
+within the Discord channel.
+The bot stores information about the messages and user interactions in a global dictionary that is stored in memory. The
+bot updates this information every time a user interacts with a message.
 Deployment
-
-To deploy the bot, you will need to create a Discord Bot account and obtain a token that will be used to connect the bot
-to your Discord server. You will also need to have Python and the `discord.py` library installed on your machine if you want to run the bot on your local machine.
-Once you have these requirements set up, you can run the bot code on your local machine, or alternatively you can use `Docker Container` to deploy it to a hosting service.
 
 ## Usage:
 
 The bot uses the following prefix to recognize commands: `!`
+And has currently only one command `poll`
+
+> **NOTE:** The bot sends `@everyone` mention for all polls!
+
+<img src="./assets/poll_1.png" alt="poll interface">
 
 ### Text based poll:
 
 To create a simple text based poll, you can type `!poll <TEXT>`
 
-<img src="https://media.giphy.com/media/PSXfiZanRfcJeMCkFs/giphy.gif" alt="Create text based poll"/>
+<img src="./assets/basic_text.gif" alt="Create text based poll"/>
 
 ### Image based poll:
 
 To create an image based poll, select the image you want to create poll about then type `!poll`.
 
-optionally you can write a text to be shared with the image `!poll <TEXT>`. 
+optionally you can write a text to be shared with the image `!poll <TEXT>`.
 
 > **Note:** If you put multiple images in one poll command, the text will be displayed on all images.
 
-<img src="https://media.giphy.com/media/QD8vTv3WVi9SiUmtZY/giphy.gif" alt="Create single image poll" style="margin-right: 10px"/>
-<img src="https://media.giphy.com/media/qrmg54BAJePYwrDzpl/giphy.gif" alt="Create multiple images polls" style="margin-left: 10px"/>
+<img src="./assets/single_image.gif" alt="Create single image poll" style="margin-right: 10px"/>
+<img src="./assets/multiple_images.gif" alt="Create multiple images polls" style="margin-left: 10px"/>
 
 
