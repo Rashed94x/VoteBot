@@ -34,7 +34,17 @@ titles = [
     "Emote your reaction!",
     "Love, like, or dislike: which one wins?",
     "The power of emotions is in your hands!",
-    "A simple choice: love, like, or dislike!"
+    "A simple choice: love, like, or dislike!",
+    "Take a stand: Yay or Nay?",
+    "The final call: Thumbs up or down?",
+    "What's your choice?",
+    "Ready to voice your opinion?",
+    "Your opinion matters, share it now!",
+    "Speak your mind.",
+    "Weigh in on this.",
+    "Express your thoughts.",
+    "Share your thoughts with us.",
+    "What's your take on this?"
 ]
 
 # Footers to the polls
@@ -54,6 +64,19 @@ footers = [
     "Your input is valuable to us!",
     "Don't miss this chance to have your say!",
     "Let your voice be heard!",
+    "Take part in shaping the future!",
+    "Your voice matters, speak up!",
+    "Make your mark with your vote!",
+    "Be a part of the decision making!",
+    "We're counting on you to weigh in!",
+    "Have your say and make a difference!",
+    "Join the conversation and have your say!",
+    "Add your voice to the mix!",
+    "Your thoughts are important to us!",
+    "Your vote can help shape the future!",
+    "Let's hear what you have to say!",
+    "Have your voice heard loud and clear!",
+    "Make your vote count and have your say!"
 ]
 
 # Fields names
