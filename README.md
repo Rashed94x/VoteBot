@@ -45,3 +45,6 @@ optionally you can write a text to be shared with the image `!poll <TEXT>`.
 ![Create single image poll](./assets/single_image.gif)
 ![Create multiple images polls](./assets/multiple_images.gif)
 
+## Contributing
+
+Please read our [Contribution Guidelines](CONTRIBUTING.md) before contributing to this project.
