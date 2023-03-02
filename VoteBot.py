@@ -1,9 +1,16 @@
 # Import the necessary modules
+import datetime
 import discord
 from discord.ext import commands
 from typing import Any
 import random
 import sys
+from pymongo import MongoClient
+
+# Define the main three options.
+liked = 'liked'
+disliked = 'disliked'
+loved = 'loved'
 
 # Try to open the token file for reading
 try:
@@ -17,6 +24,23 @@ except FileNotFoundError:
     print("The token file could not be found. Shutting down the bot...")
     # Exit the program with a return code of 1, indicating that an error occurred
     sys.exit(1)
+
+# Connect to MongoDB.
+client = MongoClient("localhost", 27017)
+# Get a list of all databases.
+dbs = client.list_database_names()
+# Check if the database exists.
+db_name = "voteBot_interactions"
+collection = "interactions"
+# Check if database exist, otherwise create a new one.
+if db_name not in dbs:
+    # Create the database.
+    client[db_name].command("create", collection)
+
+# Get instance of the database.
+db = client[db_name]
+# Get instance of the collection
+posts = db[collection]
 
 # Titles to the polls
 titles = [
@@ -34,7 +58,17 @@ titles = [
     "Emote your reaction!",
     "Love, like, or dislike: which one wins?",
     "The power of emotions is in your hands!",
-    "A simple choice: love, like, or dislike!"
+    "A simple choice: love, like, or dislike!",
+    "Take a stand: Yay or Nay?",
+    "The final call: Thumbs up or down?",
+    "What's your choice?",
+    "Ready to voice your opinion?",
+    "Your opinion matters, share it now!",
+    "Speak your mind.",
+    "Weigh in on this.",
+    "Express your thoughts.",
+    "Share your thoughts with us.",
+    "What's your take on this?"
 ]
 
 # Footers to the polls
@@ -54,14 +88,20 @@ footers = [
     "Your input is valuable to us!",
     "Don't miss this chance to have your say!",
     "Let your voice be heard!",
+    "Take part in shaping the future!",
+    "Your voice matters, speak up!",
+    "Make your mark with your vote!",
+    "Be a part of the decision making!",
+    "We're counting on you to weigh in!",
+    "Have your say and make a difference!",
+    "Join the conversation and have your say!",
+    "Add your voice to the mix!",
+    "Your thoughts are important to us!",
+    "Your vote can help shape the future!",
+    "Let's hear what you have to say!",
+    "Have your voice heard loud and clear!",
+    "Make your vote count and have your say!"
 ]
-
-# Fields names
-fields = {
-    "like": "Liked",
-    "dislike": "Disliked",
-    "love": "Loved it"
-}
 
 # Set the intents for the bot
 intents = discord.Intents.default()
@@ -78,9 +118,13 @@ class InteractedUsers:
         self.disliked = set()
         self.loved = set()
 
-
-# Create a dictionary to store all interacted users
-interacted_users = {}
+    def add(self, usr_name, clicked_button):
+        if clicked_button == liked:
+            self.liked.add(usr_name)
+        elif clicked_button == disliked:
+            self.disliked.add(usr_name)
+        elif clicked_button == loved:
+            self.loved.add(usr_name)
 
 
 # Event handler for when the bot is ready
@@ -91,10 +135,43 @@ async def on_ready():
 
 # Function to update the embed with the latest interaction data
 def update_embed(embed: Any, msg_id: int):
-    embed.set_field_at(index=0, name=fields["like"], value="\n".join(interacted_users[msg_id].liked))
-    embed.set_field_at(index=1, name=fields["dislike"], value="\n".join(interacted_users[msg_id].disliked))
-    embed.set_field_at(index=2, name=fields["love"], value="\n".join(interacted_users[msg_id].loved))
+    query = {"_id": msg_id}
+    doc_ref = posts.find_one(query)
+    embed.set_field_at(index=0, name=liked, value="\n".join(doc_ref[liked]))
+    embed.set_field_at(index=1, name=disliked, value="\n".join(doc_ref[disliked]))
+    embed.set_field_at(index=2, name=loved, value="\n".join(doc_ref[loved]))
     return embed
+
+
+def handle_database(msg_id: int, usr_name: str, clicked_button: str):
+    query = {"_id": msg_id}
+    doc_ref = posts.find_one(query)
+    # Check if the message has a document in the database, otherwise create one.
+    if doc_ref is None:
+        i = InteractedUsers()
+        i.add(usr_name, clicked_button)
+        date = {
+            '_id': msg_id,
+            'liked': list(i.liked),
+            'disliked': list(i.disliked),
+            'loved': list(i.loved),
+            'date': datetime.datetime.utcnow()
+        }
+        posts.insert_one(date)
+    else:
+        # Check if the value is already in the `liked` array
+        if usr_name in doc_ref[liked]:
+            doc_ref[liked].remove(usr_name)
+        # Check if the value is already in the `disliked` array
+        elif usr_name in doc_ref[disliked]:
+            doc_ref[disliked].remove(usr_name)
+        # Check if the value is already in the `loved` array
+        elif usr_name in doc_ref[loved]:
+            doc_ref[loved].remove(usr_name)
+
+        doc_ref[clicked_button].append(usr_name)
+        # Save the updated document back to the database
+        posts.replace_one(query, doc_ref)
 
 
 # Define the class Menu
@@ -109,24 +186,9 @@ class Menu(discord.ui.View):
         msg_id = interaction.message.id
         usr_name = interaction.user.name
 
-        # Check if the interaction message is not in the dictionary and create a new object if it's not
-        if interaction.message.id not in interacted_users:
-            interacted_users[msg_id] = InteractedUsers()
+        # update the database.
+        handle_database(msg_id, usr_name, liked)
 
-        # Check if the user already liked, loved, or disliked the message and remove the previous interaction if exists
-        else:
-            if usr_name in interacted_users[msg_id].disliked:
-                interacted_users[msg_id].disliked.remove(usr_name)
-
-            elif usr_name in interacted_users[msg_id].loved:
-                interacted_users[msg_id].loved.remove(usr_name)
-
-            elif usr_name in interacted_users[msg_id].liked:
-                await interaction.response.send_message("You already like it!", ephemeral=True)
-                return
-
-        # Add the interacted user to the liked list
-        interacted_users[msg_id].liked.add(usr_name)
         # call the update embed function and send the new embed to Discord
         await interaction.response.edit_message(embed=update_embed(interaction.message.embeds[0], msg_id))
 
@@ -136,24 +198,9 @@ class Menu(discord.ui.View):
         msg_id = interaction.message.id
         usr_name = interaction.user.name
 
-        # Check if the interaction message is not in the dictionary and create a new object if it's not
-        if interaction.message.id not in interacted_users:
-            interacted_users[msg_id] = InteractedUsers()
+        # update the database.
+        handle_database(msg_id, usr_name, disliked)
 
-        # Check if the user already liked, loved, or disliked the message and remove the previous interaction if exists
-        else:
-            if usr_name in interacted_users[msg_id].liked:
-                interacted_users[msg_id].liked.remove(usr_name)
-
-            elif usr_name in interacted_users[msg_id].loved:
-                interacted_users[msg_id].loved.remove(usr_name)
-
-            elif usr_name in interacted_users[msg_id].disliked:
-                await interaction.response.send_message("You already dislike it!", ephemeral=True)
-                return
-
-        # Add the interacted user to the disliked list
-        interacted_users[msg_id].disliked.add(usr_name)
         # call the update embed function and send the new embed to Discord
         await interaction.response.edit_message(embed=update_embed(interaction.message.embeds[0], msg_id))
 
@@ -163,24 +210,9 @@ class Menu(discord.ui.View):
         msg_id = interaction.message.id
         usr_name = interaction.user.name
 
-        # Check if the interaction message is not in the dictionary and create a new object if it's not
-        if interaction.message.id not in interacted_users:
-            interacted_users[msg_id] = InteractedUsers()
+        # update the database.
+        handle_database(msg_id, usr_name, loved)
 
-        # Check if the user already liked, loved, or disliked the message and remove the previous interaction if exists
-        else:
-            if usr_name in interacted_users[msg_id].liked:
-                interacted_users[msg_id].liked.remove(usr_name)
-
-            elif usr_name in interacted_users[msg_id].disliked:
-                interacted_users[msg_id].disliked.remove(usr_name)
-
-            elif usr_name in interacted_users[msg_id].loved:
-                await interaction.response.send_message("You already love it!", ephemeral=True)
-                return
-
-        # Add the interacted user to the loved list
-        interacted_users[msg_id].loved.add(usr_name)
         # call the update embed function and send the new embed to Discord
         await interaction.response.edit_message(embed=update_embed(interaction.message.embeds[0], msg_id))
 
@@ -195,14 +227,17 @@ async def poll(ctx, *, message: str = ''):
     # create a view with Menu object
     view = Menu()
 
+    # get the author of the message and convert to a string
+    author = str(ctx.message.author)
+
     # Delete the original message
     await ctx.message.delete()
 
     # create embed object with its fields
     embed = discord.Embed(description=message, color=discord.Color.random())
-    embed.add_field(name=fields["like"], value='', inline=True)
-    embed.add_field(name=fields["dislike"], value='', inline=True)
-    embed.add_field(name=fields["love"], value='', inline=True)
+    embed.add_field(name=liked, value='', inline=True)
+    embed.add_field(name=disliked, value='', inline=True)
+    embed.add_field(name=loved, value='', inline=True)
 
     # check if there's any attachments
     if len(ctx.message.attachments) > 0:
@@ -215,7 +250,7 @@ async def poll(ctx, *, message: str = ''):
     else:
         # create a poll without attachments
         embed.title = random.choice(titles)
-        embed.set_footer(text=random.choice(footers))
+        embed.set_footer(text=random.choice(footers) + '\ncreated by ' + author)
         await ctx.send(content="@everyone", view=view, embed=embed)
 
 
