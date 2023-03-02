@@ -47,4 +47,4 @@ optionally you can write a text to be shared with the image `!poll <TEXT>`.
 
 ## Contributing
 
-Please read our [Contribution Guidelines](CONTRIBUTING.md) before contributing to this project.
+Please read our [Contribution Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) before contributing to this project.
