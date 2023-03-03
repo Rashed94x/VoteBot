@@ -45,6 +45,34 @@ optionally you can write a text to be shared with the image `!poll <TEXT>`.
 ![Create single image poll](./assets/single_image.gif)
 ![Create multiple images polls](./assets/multiple_images.gif)
 
+---
+
+## Meet the Team
+
+We are a group of friends who decided to work on this project for fun. Here are the people behind it:
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/Rashed94x">
+    <img src="https://avatars.githubusercontent.com/u/91633338?v=4" width="76px;" alt=""/>
+    <br /><sub><b>Rashed</b></sub></a><br />
+    </td>
+    <td align="center"><a href="https://github.com/Bernas321">
+    <img src="https://avatars.githubusercontent.com/u/77720719?v=4" width="76px;" alt=""/>
+    <br /><sub><b>Berna</b></sub></a><br />
+    </td>
+    <td align="center"><a href="https://github.com/Othmanalkhellawi">
+    <img src="https://avatars.githubusercontent.com/u/102367480?v=4" width="76px;" alt=""/>
+    <br /><sub><b>Othman</b></sub></a><br />
+    </td>
+</table>
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
 ## Contributing
 
 Please read our [Contribution Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) before contributing to this project.
